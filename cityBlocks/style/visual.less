@@ -1,0 +1,148 @@
+.cb-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif;
+    color: #252423;
+}
+
+.cb-svg {
+    display: block;
+}
+
+.cb-zoomable {
+    cursor: grab;
+    touch-action: none;
+}
+
+.cb-dragging,
+.cb-dragging .cb-column {
+    cursor: grabbing;
+}
+
+.cb-column {
+    cursor: pointer;
+    transition: opacity 120ms ease;
+
+    &:hover .cb-block {
+        filter: brightness(1.12);
+    }
+}
+
+// Thin light seams between stacked blocks.
+.cb-block rect {
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 0.75px;
+}
+
+.cb-selected .cb-block rect {
+    stroke: #252423;
+    stroke-width: 1px;
+}
+
+.cb-shadow {
+    fill: rgba(0, 0, 0, 0.18);
+}
+
+.cb-label {
+    fill: #252423;
+    font-weight: 600;
+    // White halo keeps labels readable over borders and other columns.
+    paint-order: stroke;
+    stroke: rgba(255, 255, 255, 0.9);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.cb-label-city {
+    font-weight: 400;
+    fill: #605E5C;
+}
+
+.cb-key text {
+    fill: #605E5C;
+}
+
+.cb-footer {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    max-width: 60%;
+    text-align: right;
+    font-size: 9px;
+    pointer-events: none;
+}
+
+.cb-unmatched {
+    color: #A4262C;
+}
+
+.cb-credit {
+    color: #8A8886;
+}
+
+.cb-zoom-buttons {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #C8D1DC;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+    button {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid #E1E5EA;
+        background: #FFFFFF;
+        color: #1F3A5F;
+        font: 600 15px/26px "Segoe UI", sans-serif;
+        cursor: pointer;
+
+        &:last-child {
+            border-bottom: 0;
+            font-size: 13px;
+        }
+
+        &:hover {
+            background: #F0F4F9;
+        }
+
+        &:focus-visible {
+            outline: 2px solid #1F6FB2;
+            outline-offset: -2px;
+        }
+    }
+}
+
+.cb-empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: min(420px, 80%);
+    padding: 12px 16px;
+    border: 1px solid #C8D1DC;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #252423;
+    font-size: 12px;
+    pointer-events: none;
+
+    p {
+        margin: 6px 0 0;
+        color: #605E5C;
+    }
+}
+
+.cb-landing {
+    padding: 16px;
+    color: #605E5C;
+    font-size: 12px;
+}

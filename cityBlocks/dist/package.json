@@ -1,0 +1,17 @@
+{
+		"version": "1.0.2.0",
+		"author": {"name":"TradeFlags","email":"razjir@gmail.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/cityBlocks926820B09EBA4A63B6512F10E521D0C2.pbiviz.json"
+			}
+		],
+		"visual": {"name":"cityBlocks","displayName":"City Blocks","guid":"cityBlocks926820B09EBA4A63B6512F10E521D0C2","visualClassName":"Visual","version":"1.0.2.0","description":"World map with a column of stacked blocks on each city, scaled to a measure. Cities are located by name and country code from an embedded GeoNames list (population over 15,000); optional latitude/longitude fields override the lookup. No map service or internet access needed.","supportUrl":"https://www.geonames.org","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

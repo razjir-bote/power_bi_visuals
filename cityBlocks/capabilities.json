@@ -1,0 +1,264 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "City",
+            "description": "City name, e.g. Sydney. Matched against GeoNames cities with population over 15,000.",
+            "name": "city",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Country code",
+            "description": "ISO alpha-2 code (AU), alpha-3 code, numeric code or English country name. Picks the right city when names repeat across countries.",
+            "name": "country",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Latitude",
+            "description": "Optional. With Longitude, overrides the city lookup (for places not in the list).",
+            "name": "latitude",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Longitude",
+            "description": "Optional. With Latitude, overrides the city lookup.",
+            "name": "longitude",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Height",
+            "description": "Measure. Each city's column of blocks is scaled to its value.",
+            "name": "size",
+            "kind": "Measure"
+        },
+        {
+            "displayName": "Tooltips",
+            "description": "Extra measures shown when hovering a column.",
+            "name": "tooltips",
+            "kind": "Measure"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "city": {
+                        "max": 1
+                    },
+                    "country": {
+                        "max": 1
+                    },
+                    "latitude": {
+                        "max": 1
+                    },
+                    "longitude": {
+                        "max": 1
+                    },
+                    "size": {
+                        "max": 1
+                    }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "select": [
+                        {
+                            "bind": {
+                                "to": "city"
+                            }
+                        },
+                        {
+                            "bind": {
+                                "to": "country"
+                            }
+                        },
+                        {
+                            "bind": {
+                                "to": "latitude"
+                            }
+                        },
+                        {
+                            "bind": {
+                                "to": "longitude"
+                            }
+                        }
+                    ],
+                    "dataReductionAlgorithm": {
+                        "top": {
+                            "count": 3000
+                        }
+                    }
+                },
+                "values": {
+                    "select": [
+                        {
+                            "bind": {
+                                "to": "size"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "tooltips"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "objects": {
+        "map": {
+            "properties": {
+                "projection": {
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "naturalEarth",
+                                "displayName": "Natural Earth"
+                            },
+                            {
+                                "value": "equalEarth",
+                                "displayName": "Equal Earth"
+                            },
+                            {
+                                "value": "mercator",
+                                "displayName": "Mercator"
+                            }
+                        ]
+                    }
+                },
+                "hideAntarctica": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "zoomToData": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "zoomEnabled": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showZoomButtons": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "landColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "highlightCountries": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "countryHighlightColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "borderColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "backColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "blocks": {
+            "properties": {
+                "color": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "maxHeight": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "width": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "blockValue": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "depth": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showKey": {
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+        },
+        "labels": {
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showCity": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "fontSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "tooltips": {
+        "supportedTypes": {
+            "default": true,
+            "canvas": true
+        },
+        "roles": [
+            "tooltips"
+        ]
+    },
+    "supportsHighlight": true,
+    "supportsLandingPage": true,
+    "supportsEmptyDataView": true,
+    "supportsMultiVisualSelection": true,
+    "privileges": []
+}
