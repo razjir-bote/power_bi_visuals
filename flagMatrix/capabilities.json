@@ -94,6 +94,13 @@
                             }
                         }
                     }
+                },
+                "alignment": {
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
                 }
             }
         },
@@ -120,6 +127,15 @@
                                 "color": true
                             }
                         }
+                    }
+                }
+            }
+        },
+        "firstColumn": {
+            "properties": {
+                "width": {
+                    "type": {
+                        "numeric": true
                     }
                 }
             }
@@ -161,6 +177,13 @@
                 "columnWidth": {
                     "type": {
                         "numeric": true
+                    }
+                },
+                "alignment": {
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
                     }
                 }
             }

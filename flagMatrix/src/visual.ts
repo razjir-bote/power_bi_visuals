@@ -130,6 +130,11 @@ export class Visual implements IVisual {
         return valueFormatter.format(value, source && source.format);
     }
 
+    /** Alignment slice value as a CSS text-align keyword; anything unexpected falls back to right. */
+    private static alignment(value: string | undefined): "left" | "center" | "right" {
+        return value === "left" || value === "center" ? value : "right";
+    }
+
     /** Accepts a data: URI, an http(s) URL, or bare base64 PNG data. */
     private static imageSource(value: string | null): string | null {
         if (!value) return null;
@@ -141,6 +146,20 @@ export class Visual implements IVisual {
     private render(model: MatrixModel): void {
         const s = this.formattingSettings;
         const header = s.header, groups = s.rowGroups, cells = s.cells;
+        const headerAlign = Visual.alignment(header.alignment.value);
+        const cellAlign = Visual.alignment(cells.alignment.value);
+        const firstColumnWidth = Math.max(0, Math.round(Number(s.firstColumn.width.value) || 0));
+        // Every first-column cell gets the same width, so the frozen column lines up in all rows.
+        const sizeFirstColumn = (cell: HTMLElement): void => {
+            if (firstColumnWidth > 0) {
+                cell.style.width = cell.style.minWidth = cell.style.maxWidth = `${firstColumnWidth}px`;
+                cell.classList.add("fm-fixed");
+                if (cell.textContent) cell.title = cell.textContent;
+            } else {
+                // A 1px width shrinks the column to its longest label; the spare width goes to the value columns.
+                cell.style.width = "1px";
+            }
+        };
 
         const scroll = document.createElement("div");
         scroll.className = "fm-scroll";
@@ -155,13 +174,16 @@ export class Visual implements IVisual {
         const corner = document.createElement("th");
         corner.className = "fm-corner";
         corner.textContent = model.rowsFieldName || "";
+        sizeFirstColumn(corner);
         headRow.appendChild(corner);
         model.columns.forEach(column => {
             const th = document.createElement("th");
             th.className = "fm-col";
             th.style.minWidth = `${cells.columnWidth.value}px`;
+            th.style.textAlign = headerAlign;
             const wrap = document.createElement("div");
             wrap.className = "fm-col-head";
+            wrap.style.justifyContent = headerAlign === "right" ? "flex-end" : headerAlign === "center" ? "center" : "flex-start";
             const src = Visual.imageSource(column.image);
             if (src) {
                 const img = document.createElement("img");
@@ -196,10 +218,12 @@ export class Visual implements IVisual {
             th.className = indent ? "fm-label fm-indent" : "fm-label";
             th.scope = "row";
             th.textContent = labelText;
+            sizeFirstColumn(th);
             tr.appendChild(th);
             values.forEach(value => {
                 const td = document.createElement("td");
                 td.className = "fm-cell";
+                td.style.textAlign = cellAlign;
                 td.textContent = value === null || value === undefined ? "" : valueFormatter.format(value, format);
                 if (typeof value === "number" && value < 0) td.style.color = cells.negativeColor.value.value;
                 tr.appendChild(td);
@@ -222,6 +246,7 @@ export class Visual implements IVisual {
                 th.style.fontSize = `${groups.fontSize.value}pt`;
                 th.style.color = groups.fontColor.value.value;
                 th.style.backgroundColor = groups.backColor.value.value;
+                sizeFirstColumn(th);
                 tr.appendChild(th);
                 const filler = document.createElement("td");
                 filler.className = "fm-group-fill";
