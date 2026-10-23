@@ -1,0 +1,215 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Country",
+            "description": "ISO 3166 alpha-2 code (e.g. AU), alpha-3 code (AUS), numeric code (036) or English country name.",
+            "name": "location",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Shade by",
+            "description": "Optional measure. Countries are shaded on a gradient by its value. Without it, every listed country gets the highlight color.",
+            "name": "color",
+            "kind": "Measure"
+        },
+        {
+            "displayName": "Tooltips",
+            "description": "Extra measures shown when hovering a country.",
+            "name": "tooltips",
+            "kind": "Measure"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "location": {
+                        "max": 1
+                    },
+                    "color": {
+                        "max": 1
+                    }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": {
+                        "in": "location"
+                    },
+                    "dataReductionAlgorithm": {
+                        "top": {
+                            "count": 1000
+                        }
+                    }
+                },
+                "values": {
+                    "select": [
+                        {
+                            "bind": {
+                                "to": "color"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "tooltips"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "objects": {
+        "map": {
+            "properties": {
+                "projection": {
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "naturalEarth",
+                                "displayName": "Natural Earth"
+                            },
+                            {
+                                "value": "equalEarth",
+                                "displayName": "Equal Earth"
+                            },
+                            {
+                                "value": "mercator",
+                                "displayName": "Mercator"
+                            }
+                        ]
+                    }
+                },
+                "hideAntarctica": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "zoomToData": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "zoomEnabled": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showZoomButtons": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "backColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "shading": {
+            "properties": {
+                "highlightColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "minColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "maxColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "diverging": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "midColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "noDataColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "borders": {
+            "properties": {
+                "color": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "width": {
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        },
+        "legend": {
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "fontSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "tooltips": {
+        "supportedTypes": {
+            "default": true,
+            "canvas": true
+        },
+        "roles": [
+            "tooltips"
+        ]
+    },
+    "supportsHighlight": true,
+    "supportsLandingPage": true,
+    "supportsEmptyDataView": true,
+    "supportsMultiVisualSelection": true,
+    "privileges": []
+}

@@ -1,0 +1,17 @@
+{
+		"version": "1.0.2.0",
+		"author": {"name":"TradeFlags","email":"razjir@gmail.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/worldMap8D037D486EEE4B3EAC2A36315F60DC8A.pbiviz.json"
+			}
+		],
+		"visual": {"name":"worldMap","displayName":"Trade World Map","guid":"worldMap8D037D486EEE4B3EAC2A36315F60DC8A","visualClassName":"Visual","version":"1.0.2.0","description":"World shape map that shades countries by a measure (or highlights the ones listed). Countries match on ISO alpha-2/alpha-3/numeric code or English name. Shapes are embedded (Natural Earth 1:50m via world-atlas), so no map service or internet access is needed.","supportUrl":"https://github.com/topojson/world-atlas","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

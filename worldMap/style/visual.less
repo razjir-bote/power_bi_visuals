@@ -1,0 +1,98 @@
+.wm-root {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif;
+    color: #252423;
+}
+
+.wm-svg {
+    display: block;
+}
+
+.wm-zoomable {
+    cursor: grab;
+    touch-action: none;
+}
+
+.wm-dragging,
+.wm-dragging .wm-has-data {
+    cursor: grabbing;
+}
+
+.wm-zoom-buttons {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #C8D1DC;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+    button {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid #E1E5EA;
+        background: #FFFFFF;
+        color: #1F3A5F;
+        font: 600 15px/26px "Segoe UI", sans-serif;
+        cursor: pointer;
+
+        &:last-child {
+            border-bottom: 0;
+            font-size: 13px;
+        }
+
+        &:hover {
+            background: #F0F4F9;
+        }
+
+        &:focus-visible {
+            outline: 2px solid #1F6FB2;
+            outline-offset: -2px;
+        }
+    }
+}
+
+.wm-country {
+    stroke-linejoin: round;
+    transition: fill-opacity 120ms ease;
+}
+
+.wm-has-data {
+    cursor: pointer;
+
+    &:hover {
+        stroke: #252423;
+        stroke-width: 1px;
+    }
+}
+
+.wm-selected {
+    stroke: #252423;
+    stroke-width: 1.2px;
+}
+
+.wm-legend text {
+    fill: #605E5C;
+}
+
+.wm-unmatched {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    max-width: 60%;
+    font-size: 9px;
+    color: #A4262C;
+    text-align: right;
+}
+
+.wm-landing {
+    padding: 16px;
+    color: #605E5C;
+    font-size: 12px;
+}
