@@ -1,0 +1,173 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Rows",
+            "description": "Optional grouping shown down the side, e.g. exporter. Each item is listed once with the values indented beneath it.",
+            "name": "rows",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Columns",
+            "description": "First field: column name (e.g. country). Optional second field: image shown before the name (base64 PNG, data: URI or https URL).",
+            "name": "columns",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Values",
+            "description": "Measures. Each one becomes a row (per row item) and keeps its own format string.",
+            "name": "values",
+            "kind": "Measure"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "rows": {
+                        "max": 1
+                    },
+                    "columns": {
+                        "max": 2
+                    }
+                }
+            ],
+            "matrix": {
+                "rows": {
+                    "for": {
+                        "in": "rows"
+                    },
+                    "dataReductionAlgorithm": {
+                        "top": {
+                            "count": 1000
+                        }
+                    }
+                },
+                "columns": {
+                    "for": {
+                        "in": "columns"
+                    },
+                    "dataReductionAlgorithm": {
+                        "top": {
+                            "count": 300
+                        }
+                    }
+                },
+                "values": {
+                    "select": [
+                        {
+                            "for": {
+                                "in": "values"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "objects": {
+        "header": {
+            "properties": {
+                "imageHeight": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "backColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "rowGroups": {
+            "properties": {
+                "fontSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "backColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "cells": {
+            "properties": {
+                "fontSize": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "bandColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "negativeColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "columnWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "privileges": [],
+    "supportsLandingPage": true,
+    "supportsEmptyDataView": true,
+    "suppressDefaultTitle": false
+}

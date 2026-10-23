@@ -1,0 +1,26 @@
+{
+  "visual": {
+    "name": "flagMatrix",
+    "displayName": "Flag Matrix",
+    "guid": "flagMatrixACAE9662886D464392FE183D3D7E49EF",
+    "visualClassName": "Visual",
+    "version": "1.0.1.0",
+    "description": "Matrix whose column headers show an image (e.g. a country flag) next to the column name. Rows-field items are listed once with each measure indented beneath; values keep their measure format strings.",
+    "supportUrl": "https://flagcdn.com",
+    "gitHubUrl": ""
+  },
+  "apiVersion": "5.11.1",
+  "author": {
+    "name": "TradeFlags",
+    "email": "razjir@gmail.com"
+  },
+  "assets": {
+    "icon": "assets/icon.png"
+  },
+  "externalJS": null,
+  "style": "style/visual.less",
+  "capabilities": "capabilities.json",
+  "dependencies": null,
+  "stringResources": [],
+  "version": "1.0.1.0"
+}
