@@ -1,0 +1,44 @@
+name: 'shop'
+version: '1.0.0'
+config-version: 2
+
+profile: 'shop'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Time zone for timestamped backup names and the cleanup cutoff (backup_to_int_backups, cleanup_int_backups).
+  backup_timezone: Australia/Brisbane
+
+# Profile new backups into int_backups.<table>_stats after any command that can take backups.
+# Only backups not yet profiled are read, so this is cheap when a run took no backups.
+on-run-end:
+  - "{% if flags.WHICH in ['run', 'build', 'seed', 'snapshot'] %}{{ collect_backup_stats() }}{% endif %}"
+
+# Synapse table storage: the adapter defaults to ROUND_ROBIN + CLUSTERED COLUMNSTORE INDEX.
+# Columnstore needs ~1M rows per distribution (60M+ rows) to compress well, so these
+# small tables use HEAP. Switch large fact tables to CLUSTERED COLUMNSTORE INDEX as they grow.
+models:
+  shop:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts
+      +dist: ROUND_ROBIN
+      +index: HEAP
+
+seeds:
+  shop:
+    +schema: raw
+    +dist: ROUND_ROBIN
+    +index: HEAP
