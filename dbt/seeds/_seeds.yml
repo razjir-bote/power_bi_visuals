@@ -1,0 +1,40 @@
+version: 2
+
+seeds:
+  - name: raw_customers
+    description: Raw customer records loaded from CSV, as exported from the shop system.
+    columns:
+      - name: id
+        description: Customer identifier. Becomes customer_id in staging.
+      - name: first_name
+        description: Customer's first name.
+      - name: last_name
+        description: Customer's last name.
+      - name: email
+        description: Customer's email address, as entered (not normalised).
+      - name: created_at
+        description: Date the customer account was created.
+
+  - name: raw_orders
+    description: Raw order records loaded from CSV, as exported from the shop system.
+    columns:
+      - name: id
+        description: Order identifier. Becomes order_id in staging.
+      - name: user_id
+        description: Identifier of the customer who placed the order. Becomes customer_id in staging.
+      - name: order_date
+        description: Date the order was placed.
+      - name: status
+        description: "Order status: placed, shipped, completed, return_pending or returned."
+
+  - name: raw_payments
+    description: Raw payment records loaded from CSV, as exported from the payment system.
+    columns:
+      - name: id
+        description: Payment identifier. Becomes payment_id in staging.
+      - name: order_id
+        description: Identifier of the order the payment belongs to.
+      - name: payment_method
+        description: "How the payment was made: credit_card, coupon, bank_transfer or gift_card."
+      - name: amount
+        description: Payment amount in cents.

@@ -1,0 +1,7 @@
+sample_shop:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: sample_shop.duckdb
+      threads: 4

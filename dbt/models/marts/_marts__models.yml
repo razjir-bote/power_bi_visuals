@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: orders
+    description: One row per order, with payment amounts pivoted by payment method.
+    config:
+      meta:
+        owner: finance-team
+        contains_pii: false
+        refresh_sla_hours: 24
+    columns:
+      - name: order_id
+        description: Primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Customer who placed the order. Foreign key to customers.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('customers')
+                field: customer_id
+      - name: order_date
+        description: Date the order was placed.
+      - name: status
+        description: "Order status: placed, shipped, completed, return_pending or returned."
+      - name: credit_card_amount
+        description: Amount paid for the order by credit card, in dollars. 0 if none.
+      - name: coupon_amount
+        description: Amount paid for the order by coupon, in dollars. 0 if none.
+      - name: bank_transfer_amount
+        description: Amount paid for the order by bank transfer, in dollars. 0 if none.
+      - name: gift_card_amount
+        description: Amount paid for the order by gift card, in dollars. 0 if none.
+      - name: amount
+        description: Total amount paid for the order, in dollars.
+        data_tests:
+          - not_null
+
+  - name: customers
+    description: One row per customer, with order history and lifetime value. Returned and return-pending orders are excluded.
+    config:
+      meta:
+        contains_pii: true
+        consumers: [marketing, finance]
+    columns:
+      - name: customer_id
+        description: Primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Customer's first name.
+        config:
+          meta:
+            pii: true
+            masking_policy: mask_name
+      - name: last_name
+        description: Customer's last name.
+        config:
+          meta:
+            pii: true
+            masking_policy: mask_name
+      - name: email
+        description: Customer's email address, lower-cased.
+        config:
+          meta:
+            pii: true
+            masking_policy: mask_email
+      - name: created_at
+        description: Date the customer account was created.
+      - name: first_order_date
+        description: Date of the customer's first non-returned order. Null if they have none.
+      - name: most_recent_order_date
+        description: Date of the customer's most recent non-returned order. Null if they have none.
+      - name: number_of_orders
+        description: Count of non-returned orders placed by the customer.
+      - name: lifetime_value
+        description: Total dollars paid across the customer's non-returned orders.
+        config:
+          meta:
+            unit: USD
+            metric_owner: finance-team

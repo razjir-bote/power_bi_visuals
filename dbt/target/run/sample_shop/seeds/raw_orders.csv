@@ -1,0 +1,11 @@
+
+    
+    
+    truncate table "sample_shop"."raw"."raw_orders";
+    -- dbt seed --
+    
+          COPY "sample_shop"."raw"."raw_orders" FROM 'C:\dbt\seeds\raw_orders.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

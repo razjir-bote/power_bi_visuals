@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: One row per customer, cleaned from the raw customers seed.
+    columns:
+      - name: customer_id
+        description: Primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: first_name
+        description: Customer's first name.
+      - name: last_name
+        description: Customer's last name.
+      - name: email
+        description: Customer's email address, lower-cased. Unique per customer.
+        data_tests:
+          - unique
+          - not_null
+      - name: created_at
+        description: Date the customer account was created.
+
+  - name: stg_orders
+    description: One row per order, cleaned from the raw orders seed.
+    columns:
+      - name: order_id
+        description: Primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Customer who placed the order. Foreign key to stg_customers.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_date
+        description: Date the order was placed.
+      - name: status
+        description: "Order status: placed, shipped, completed, return_pending or returned."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
+
+  - name: stg_payments
+    description: One row per payment. Amounts are converted from cents to dollars.
+    columns:
+      - name: payment_id
+        description: Primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: Order the payment belongs to. Foreign key to stg_orders.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: payment_method
+        description: "How the payment was made: credit_card, coupon, bank_transfer or gift_card."
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
+      - name: amount
+        description: Payment amount in dollars, rounded to 2 decimal places.
