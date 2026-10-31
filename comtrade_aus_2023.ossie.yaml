@@ -1,0 +1,284 @@
+# Apache Ossie semantic model for the UN Comtrade extract in data/.
+# Physical layer: comtrade.duckdb, built by semantic/build_warehouse.sql.
+version: 0.2.0.dev0
+name: comtrade_australia_2023
+description: >-
+  Australia's 2023 merchandise trade (imports and exports) with every partner
+  economy, at HS 2022 six-digit product detail. Source: UN Comtrade v1, annual,
+  all modes of transport, all customs procedures. Values are current US dollars.
+ai_context:
+  instructions: >-
+    Australia is always the reporter; "partner" is the other economy. Exports
+    (flow_code 'X') are valued FOB, imports (flow_code 'M') CIF, so the trade
+    balance compares FOB exports with CIF imports, as Comtrade does. Data covers
+    the single year 2023 only; no growth rates can be computed. Physical
+    quantities (qty) mix units, so only compare or sum them within one qty_unit.
+    Partner "Other Asia, nes" (code 490) is the Comtrade designation for Taiwan.
+    HS chapter 71 (gold) is a large export line; mention it when it drives results.
+    About USD 64bn of exports (17%) is reported against partner "Areas, nes"
+    (code 899) for confidentiality, including USD 49.5bn of LNG (HS 2711), so
+    per-country export figures understate LNG buyers. Say so when ranking markets
+    or analysing gas.
+  synonyms: [Australian trade, merchandise trade, customs trade, Comtrade]
+  examples:
+    - What were Australia's top 10 export markets in 2023?
+    - Which HS chapters make up most of Australia's imports from China?
+    - What is Australia's trade balance with the United States?
+    - What share of exports are mineral products?
+
+datasets:
+  - name: trade_flows
+    source: comtrade.main.trade_flows
+    primary_key: [ref_year, flow_code, partner_code, hs6_code]
+    description: >-
+      Fact table. One row per year, trade flow, partner and HS6 product. Only
+      six-digit rows are kept, so every measure can be summed without double
+      counting; roll up to HS4/HS2/section through commodities.
+    ai_context:
+      synonyms: [trade, shipments, customs records]
+    fields:
+      - name: ref_year
+        expression: {dialects: [{dialect: ANSI_SQL, expression: ref_year}]}
+        datatype: Integer
+        dimension: {is_time: true}
+        description: Reference year of the trade (calendar year)
+        ai_context: {synonyms: [year, period]}
+      - name: flow_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: flow_code}]}
+        datatype: String
+        description: "Trade direction code: 'X' = export, 'M' = import"
+      - name: flow_desc
+        expression: {dialects: [{dialect: ANSI_SQL, expression: flow_desc}]}
+        datatype: String
+        description: Trade direction name (Export / Import)
+        ai_context: {synonyms: [direction, trade flow]}
+      - name: partner_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: partner_code}]}
+        datatype: Integer
+        description: UN M49 code of the partner economy (foreign key to partners)
+      - name: hs6_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs6_code}]}
+        datatype: String
+        description: Six-digit HS 2022 product code, with leading zeros (foreign key to commodities)
+      - name: qty_unit
+        expression: {dialects: [{dialect: ANSI_SQL, expression: qty_unit}]}
+        datatype: String
+        description: Unit of the qty field (kg, u, l, m², carat, ...); null when no quantity is reported
+      - name: qty
+        expression: {dialects: [{dialect: ANSI_SQL, expression: qty}]}
+        datatype: Float
+        description: Physical quantity in qty_unit. Only additive within the same unit.
+      - name: is_qty_estimated
+        expression: {dialects: [{dialect: ANSI_SQL, expression: is_qty_estimated}]}
+        datatype: Boolean
+        description: True when Comtrade estimated the quantity
+      - name: net_weight_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: net_wgt_kg}]}
+        datatype: Float
+        description: Net weight in kilograms; null for about 29% of HS6 rows
+        ai_context: {synonyms: [weight, tonnage, volume]}
+      - name: is_net_weight_estimated
+        expression: {dialects: [{dialect: ANSI_SQL, expression: is_net_wgt_estimated}]}
+        datatype: Boolean
+        description: True when Comtrade estimated the net weight
+      - name: gross_weight_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: gross_wgt_kg}]}
+        datatype: Float
+        description: Gross weight in kilograms, including packaging; sparsely reported
+      - name: trade_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: primary_value_usd}]}
+        datatype: Decimal
+        description: Headline trade value in USD. CIF for imports, FOB for exports.
+        ai_context: {synonyms: [value, trade value, primary value]}
+      - name: cif_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: cif_value_usd}]}
+        datatype: Decimal
+        description: Cost, insurance and freight value in USD. Imports only; null for exports.
+      - name: fob_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: fob_value_usd}]}
+        datatype: Decimal
+        description: Free-on-board value in USD. Present for both flows.
+      - name: legacy_estimation_flag
+        expression: {dialects: [{dialect: ANSI_SQL, expression: legacy_estimation_flag}]}
+        datatype: Integer
+        description: Comtrade estimation flag. 0 means no estimation; other values flag estimated quantity or weight.
+    metrics:
+      - name: total_trade_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: SUM(trade_value_usd)}]}
+        datatype: Decimal
+        description: Exports plus imports (two-way trade) in USD
+        ai_context: {synonyms: [two-way trade, total trade, trade turnover]}
+      - name: export_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'X' THEN trade_value_usd END)"}]}
+        datatype: Decimal
+        description: Value of Australian exports (FOB) in USD
+        ai_context: {synonyms: [exports, export value, sales abroad]}
+      - name: import_value_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'M' THEN trade_value_usd END)"}]}
+        datatype: Decimal
+        description: Value of Australian imports (CIF) in USD
+        ai_context: {synonyms: [imports, import value]}
+      - name: import_value_fob_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'M' THEN fob_value_usd END)"}]}
+        datatype: Decimal
+        description: Value of imports on an FOB basis, for like-for-like comparison with exports
+      - name: trade_balance_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'X' THEN trade_value_usd WHEN flow_code = 'M' THEN -trade_value_usd END)"}]}
+        datatype: Decimal
+        description: Exports (FOB) minus imports (CIF). Positive means an Australian surplus.
+        ai_context: {synonyms: [trade surplus, trade deficit, net exports]}
+      - name: import_freight_insurance_usd
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'M' THEN cif_value_usd - fob_value_usd END)"}]}
+        datatype: Decimal
+        description: Freight and insurance cost of imports (CIF minus FOB) in USD
+      - name: total_net_weight_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: SUM(net_weight_kg)}]}
+        datatype: Float
+        description: Net weight in kilograms, summed over rows that report it
+      - name: export_net_weight_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'X' THEN net_weight_kg END)"}]}
+        datatype: Float
+        description: Net weight of exports in kilograms
+      - name: import_net_weight_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN flow_code = 'M' THEN net_weight_kg END)"}]}
+        datatype: Float
+        description: Net weight of imports in kilograms
+      - name: unit_value_usd_per_kg
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN net_weight_kg > 0 THEN trade_value_usd END) / NULLIF(SUM(CASE WHEN net_weight_kg > 0 THEN net_weight_kg END), 0)"}]}
+        datatype: Decimal
+        description: Average value per kilogram, using only rows with a reported weight. Use per flow and product.
+        ai_context: {synonyms: [price per kg, unit value, average price]}
+      - name: total_qty
+        expression: {dialects: [{dialect: ANSI_SQL, expression: SUM(qty)}]}
+        datatype: Float
+        description: Physical quantity. Meaningful only when grouped or filtered by qty_unit.
+      - name: partner_count
+        expression: {dialects: [{dialect: ANSI_SQL, expression: COUNT(DISTINCT partner_code)}]}
+        datatype: Integer
+        description: Number of distinct partner economies with trade
+      - name: product_count
+        expression: {dialects: [{dialect: ANSI_SQL, expression: COUNT(DISTINCT hs6_code)}]}
+        datatype: Integer
+        description: Number of distinct HS6 products traded
+      - name: trade_record_count
+        expression: {dialects: [{dialect: ANSI_SQL, expression: COUNT(hs6_code)}]}
+        datatype: Integer
+        description: Number of flow x partner x HS6 records
+
+  - name: partners
+    source: comtrade.main.partners
+    primary_key: [partner_code]
+    unique_keys:
+      - [partner_iso3]
+    description: The 219 partners Australia traded with in 2023, including Comtrade special areas
+    ai_context:
+      synonyms: [countries, trading partners, markets, destinations, origins]
+      instructions: >-
+        partner_type separates real economies from Comtrade special codes. Exclude
+        non-country partner types when ranking countries. "Areas, nes" (899) holds
+        confidential exports (mainly LNG), not a real destination.
+    fields:
+      - name: partner_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: partner_code}]}
+        datatype: Integer
+        description: UN M49 numeric code
+      - name: partner_iso3
+        expression: {dialects: [{dialect: ANSI_SQL, expression: partner_iso3}]}
+        datatype: String
+        description: ISO 3166 alpha-3 code, or a Comtrade pseudo-code (X1, _X, S19, F19) for special areas
+        ai_context: {synonyms: [ISO code, country code]}
+      - name: partner_name
+        expression: {dialects: [{dialect: ANSI_SQL, expression: partner_name}]}
+        datatype: String
+        description: Partner name as published by UN Comtrade
+        ai_context: {synonyms: [country, partner, market]}
+      - name: partner_type
+        expression: {dialects: [{dialect: ANSI_SQL, expression: partner_type}]}
+        datatype: String
+        description: "'Country or territory', 'Re-imports (Australia)', 'Bunkers' (ship and aircraft fuel), or 'Unspecified area'"
+      - name: is_country_or_territory
+        expression: {dialects: [{dialect: ANSI_SQL, expression: "partner_type = 'Country or territory'"}]}
+        datatype: Boolean
+        description: True for real partner economies (includes Taiwan as 'Other Asia, nes')
+    metrics:
+      - name: partner_economy_count
+        expression: {dialects: [{dialect: ANSI_SQL, expression: COUNT(DISTINCT partner_code)}]}
+        datatype: Integer
+        description: Number of partners in the dimension
+
+  - name: commodities
+    source: comtrade.main.commodities
+    primary_key: [hs6_code]
+    description: >-
+      HS 2022 product hierarchy for every traded HS6 code: heading (HS4),
+      chapter (HS2) and the 22 HS sections.
+    ai_context:
+      synonyms: [products, goods, commodities, HS codes, tariff lines]
+    fields:
+      - name: hs6_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs6_code}]}
+        datatype: String
+        description: Six-digit HS subheading code
+      - name: hs6_desc
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs6_desc}]}
+        datatype: String
+        description: HS6 subheading description
+        ai_context: {synonyms: [product, subheading]}
+      - name: hs4_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs4_code}]}
+        datatype: String
+        description: Four-digit HS heading code
+      - name: hs4_desc
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs4_desc}]}
+        datatype: String
+        description: HS4 heading description
+        ai_context: {synonyms: [heading, product group]}
+      - name: hs2_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs2_code}]}
+        datatype: String
+        description: Two-digit HS chapter code
+      - name: hs2_desc
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs2_desc}]}
+        datatype: String
+        description: HS chapter description
+        ai_context: {synonyms: [chapter, product category]}
+      - name: hs_section_code
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs_section_code}]}
+        datatype: String
+        description: HS section in Roman numerals (I-XXI; XXII = chapters 98-99, not elsewhere specified)
+      - name: hs_section_name
+        expression: {dialects: [{dialect: ANSI_SQL, expression: hs_section_name}]}
+        datatype: String
+        description: HS section name, the broadest product grouping
+        ai_context: {synonyms: [section, sector, industry]}
+
+relationships:
+  - name: trade_flows_to_partners
+    from: trade_flows
+    to: partners
+    from_columns: [partner_code]
+    to_columns: [partner_code]
+  - name: trade_flows_to_commodities
+    from: trade_flows
+    to: commodities
+    from_columns: [hs6_code]
+    to_columns: [hs6_code]
+
+metrics:
+  - name: export_value_to_countries_usd
+    expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN trade_flows.flow_code = 'X' AND partners.partner_type = 'Country or territory' THEN trade_flows.trade_value_usd END)"}]}
+    datatype: Decimal
+    description: Exports to real partner economies, excluding bunkers, re-imports and unspecified areas
+  - name: mineral_products_export_share
+    expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(CASE WHEN trade_flows.flow_code = 'X' AND commodities.hs_section_code = 'V' THEN trade_flows.trade_value_usd END) / NULLIF(SUM(CASE WHEN trade_flows.flow_code = 'X' THEN trade_flows.trade_value_usd END), 0)"}]}
+    datatype: Decimal
+    description: Share of export value from HS section V (ores, coal, petroleum and gas), from 0 to 1
+    ai_context: {synonyms: [resources share, mining export share, commodity dependence]}
+  - name: avg_trade_value_per_partner_usd
+    expression: {dialects: [{dialect: ANSI_SQL, expression: "SUM(trade_flows.trade_value_usd) / NULLIF(COUNT(DISTINCT partners.partner_code), 0)"}]}
+    datatype: Decimal
+    description: Two-way trade value divided by the number of partners in scope
+
+custom_extensions:
+  - vendor_name: COMMON
+    data: '{"engine": "duckdb", "database_file": "comtrade.duckdb", "build_script": "semantic/build_warehouse.sql", "source_api": "https://comtradeapi.un.org/data/v1/get/C/A/HS", "reporter": "AUS", "classification": "H6"}'
